@@ -3,8 +3,9 @@
 import os
 
 #当文件存在时报错
-from make_checksum import md5_file
+from moviepy import video
 
+from make_checksum import md5_file
 
 def file_rename(filepath,res,newfilename):
     """
