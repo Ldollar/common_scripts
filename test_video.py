@@ -7,7 +7,7 @@ import multiprocessing
 import numpy
 import os
 import threading
-videos_src_path = 'E:\LOG\image\\videos\\videos'
+videos_src_path = 'E:\LOG\image\\'
 videos_save_path = 'E:\LOG\image\\frame'
 
 videos = os.listdir(videos_src_path)
@@ -30,7 +30,7 @@ def group():
         res.append(b)
         while z >= _length_array-10:
             break
-    print res
+    print "get the all videos are : ",res,len(res)
     return res
 
 
@@ -45,22 +45,31 @@ def aaa():
         each_video_full_path = os.path.join(videos_src_path, each_video)
 
         cap = cv2.VideoCapture(each_video_full_path)
+
         frame_count = 1
         success = True
+        gggg = []
         while (success):
             success, frame = cap.read()
-            print 'Read a new frame: ', success
-
+            print 'Read a new %s frame:  '%frame_count, success
+            gggg.append(frame)
             params = []
             params.append(cv2.IMWRITE_PXM_BINARY)
             cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
+            # if success == False:
+            #     print frame_count
+            #     print 'dalsdjljkjlkjljljljjljldsa'
+            #     print gggg[-2]
+            #
+            #     ff = frame_count - 1
+            #     cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % ff, gggg[-2], params)
 
             frame_count = frame_count + 1
 
         cap.release()
 
 def get_media_each_frame(each_video_name,each_video):
-    each_video_save_full_path = 'E:\LOG\image\\frame\\all\\'
+    each_video_save_full_path = 'E:\LOG\image\\frame\\all2\\'
     #each_video_save_full_path = os.path.join(videos_save_path, each_video_name) + '/'
 
     # get the full path of each video, which will open the video tp extract frames
@@ -70,22 +79,31 @@ def get_media_each_frame(each_video_name,each_video):
     cap = cv2.VideoCapture(each_video_full_path)
     frame_count = 1
     success = True
+    gggg = []
     while (success):
         success, frame = cap.read()
 
         print "Read the file is %s : and the frame count is : %s" % (each_video_name,frame_count)
         #print 'Read a new frame: ', success
-
+        gggg.append(frame)
         params = []
         params.append(cv2.IMWRITE_PXM_BINARY)
         #params.append(cv2.IMWRITE_PNG_COMPRESSION)
         if frame_count ==1:
+            print "-------------1 frame------------"
             cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
 
-        elif frame_count==1182:
-            cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
+        elif success ==True:
+            r=gggg.pop()
+
+        elif success == False:
+            try:
+                ff = frame_count - 1
+                cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % ff, r, params)
+            except Exception,e:
+                print e
+
         frame_count = frame_count + 1
-
     print "the last image file number is " % frame_count
 
     cap.release()
@@ -94,12 +112,10 @@ def get_media_each_frame(each_video_name,each_video):
 def main(list1):
     #threads=[]
     allvideoss=list1
-    pool = multiprocessing.Pool(processes=4)
+    pool = multiprocessing.Pool(processes=2)
     for each_video1 in allvideoss:
-        #print each_video1
+        print each_video1
         each_video_name1, _ = each_video1.split('.')
-        #os.mkdir(videos_save_path + '\\' + each_video_name1)
-        #get_media_each_frame(each_video_name=each_video_name1,each_video=each_video1)
         pool.apply_async(get_media_each_frame,args=(each_video_name1,each_video1,))
         #t=threading.Thread(target=get_media_each_frame,args=(each_video_name1,each_video1))
         #threads.append(t)
@@ -110,7 +126,7 @@ def main(list1):
     #t.join()
 
 if __name__ == '__main__':
-
+    #aaa()
     aaa=group()
 
     each_ten_get_two = []
@@ -125,3 +141,4 @@ if __name__ == '__main__':
             each_ten_get_two.append(i[zzz-1])
     print each_ten_get_two
     main(list1=each_ten_get_two)
+
