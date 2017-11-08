@@ -7,13 +7,13 @@ import multiprocessing
 import numpy
 import os
 import threading
-videos_src_path = 'E:\LOG\image\\'
+videos_src_path = 'E:\LOG\image\\videos'
 videos_save_path = 'E:\LOG\image\\frame'
 
 videos = os.listdir(videos_src_path)
 videos = filter(lambda x: x.endswith('mp4'), videos)
 
-def group():
+def sample_group():   #每十个视频取一对相邻的视频组
     allvideo=[]
     for each_video in videos:
         print each_video
@@ -34,7 +34,8 @@ def group():
     return res
 
 
-def aaa():
+def get_all_frame_image():
+    '''获取每一帧信息，并以jpg格式保存图片'''
     for each_video in videos:
         print each_video
         each_video_name, _ = each_video.split('.')
@@ -48,11 +49,9 @@ def aaa():
 
         frame_count = 1
         success = True
-        gggg = []
         while (success):
             success, frame = cap.read()
             print 'Read a new %s frame:  '%frame_count, success
-            gggg.append(frame)
             params = []
             params.append(cv2.IMWRITE_PXM_BINARY)
             cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
@@ -67,8 +66,57 @@ def aaa():
             frame_count = frame_count + 1
 
         cap.release()
+def get_first_last_frame_each_video():
+    '''获取一个视频的第一帧和最后一帧信息，并以jpg格式保存图片'''
+    for each_video in videos:
+        print each_video
+        each_video_name, _ = each_video.split('.')
+        #os.mkdir(videos_save_path + '\\' + each_video_name)
+        #each_video_save_full_path = os.path.join(videos_save_path, each_video_name) + '/'
+        each_video_save_full_path = 'E:\LOG\image\\frame\\all4\\'
+        # get the full path of each video, which will open the video tp extract frames
+        each_video_full_path = os.path.join(videos_src_path, each_video)
+
+        cap = cv2.VideoCapture(each_video_full_path)
+
+        frame_count = 1
+        success = True
+        put_one_franme = []
+        while (success):
+            success, frame = cap.read()
+
+            print "Read the file is %s : and the frame count is : %s" % (each_video_name, frame_count)
+            # print 'Read a new frame: ', success
+            put_one_franme.append(frame)
+            params = []
+            params.append(cv2.IMWRITE_PXM_BINARY)
+            # params.append(cv2.IMWRITE_PNG_COMPRESSION)
+            if frame_count == 1:
+                # print "-------------1 frame------------"
+                cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
+
+            elif success == True:
+                out_one_frame = put_one_franme.pop()
+
+            elif success == False:
+                try:
+                    last_true_frame_number = frame_count - 1
+                    cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % last_true_frame_number, out_one_frame, params)
+                except Exception, e:
+                    print e
+
+            frame_count = frame_count + 1
+        print "the last image file number is %s " % frame_count
+
+        cap.release()
 
 def get_media_each_frame(each_video_name,each_video):
+    '''
+    获取视频每一帧信息，并保存第一帧和最后一帧
+    :param each_video_name: 视频文件名称，不带后缀
+    :param each_video: 带后缀的视频文件
+    :return:
+    '''
     each_video_save_full_path = 'E:\LOG\image\\frame\\all2\\'
     #each_video_save_full_path = os.path.join(videos_save_path, each_video_name) + '/'
 
@@ -79,27 +127,27 @@ def get_media_each_frame(each_video_name,each_video):
     cap = cv2.VideoCapture(each_video_full_path)
     frame_count = 1
     success = True
-    gggg = []
+    put_one_franme = []
     while (success):
         success, frame = cap.read()
 
         print "Read the file is %s : and the frame count is : %s" % (each_video_name,frame_count)
         #print 'Read a new frame: ', success
-        gggg.append(frame)
+        put_one_franme.append(frame)
         params = []
         params.append(cv2.IMWRITE_PXM_BINARY)
         #params.append(cv2.IMWRITE_PNG_COMPRESSION)
         if frame_count ==1:
-            print "-------------1 frame------------"
+            #print "-------------1 frame------------"
             cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % frame_count, frame, params)
 
         elif success ==True:
-            r=gggg.pop()
+            out_one_frame=put_one_franme.pop()
 
         elif success == False:
             try:
-                ff = frame_count - 1
-                cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % ff, r, params)
+                last_true_frame_number = frame_count - 1
+                cv2.imwrite(each_video_save_full_path + each_video_name + "_%d.jpg" % last_true_frame_number, out_one_frame, params)
             except Exception,e:
                 print e
 
@@ -107,6 +155,12 @@ def get_media_each_frame(each_video_name,each_video):
     print "the last image file number is " % frame_count
 
     cap.release()
+
+# def test_timer():
+#     print '---------- i am test 123 --------'
+#     global timer
+#     timer = threading.Timer(20,test_timer)
+#     timer.start()
 
 
 def main(list1):
@@ -117,8 +171,8 @@ def main(list1):
         print each_video1
         each_video_name1, _ = each_video1.split('.')
         pool.apply_async(get_media_each_frame,args=(each_video_name1,each_video1,))
-        #t=threading.Thread(target=get_media_each_frame,args=(each_video_name1,each_video1))
-        #threads.append(t)
+    # timer = threading.Timer(1,test_timer)
+    # timer.start()
     pool.close()
     pool.join()
     #for i in threads:
@@ -126,19 +180,20 @@ def main(list1):
     #t.join()
 
 if __name__ == '__main__':
-    #aaa()
-    aaa=group()
-
-    each_ten_get_two = []
-    for i in aaa:
-        length_ten_arry=len(i)
-        #print length_ten_arry
-        rd =Random()
-        if length_ten_arry>=2:
-            zzz=rd.randint(0,length_ten_arry-1)
-            #print i
-            each_ten_get_two.append(i[zzz])
-            each_ten_get_two.append(i[zzz-1])
-    print each_ten_get_two
-    main(list1=each_ten_get_two)
+    #get_all_frame_image()
+    get_first_last_frame_each_video()
+    # get_all_frame_image=sample_group()
+    #
+    # each_ten_get_two = []
+    # for i in get_all_frame_image:
+    #     length_ten_arry=len(i)
+    #     #print length_ten_arry
+    #     rd =Random()
+    #     if length_ten_arry>=2:
+    #         zzz=rd.randint(0,length_ten_arry-1)
+    #         #print i
+    #         each_ten_get_two.append(i[zzz])
+    #         each_ten_get_two.append(i[zzz-1])
+    # print each_ten_get_two
+    # main(list1=each_ten_get_two)
 
