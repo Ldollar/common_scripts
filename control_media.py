@@ -8,4 +8,4 @@ from moviepy.editor import *
 imageio.plugins.ffmpeg.download()
 os.chdir("E:\LOG\image")
 aaa=VideoFileClip("E:\LOG\image\\20171030144718.mp4")
-#aaa.
+#get_all_frame_image.

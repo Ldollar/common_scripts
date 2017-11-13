@@ -73,7 +73,7 @@ def get_first_last_frame_each_video():
         each_video_name, _ = each_video.split('.')
         #os.mkdir(videos_save_path + '\\' + each_video_name)
         #each_video_save_full_path = os.path.join(videos_save_path, each_video_name) + '/'
-        each_video_save_full_path = 'E:\LOG\image\\frame\\all4\\'
+        each_video_save_full_path = 'E:\LOG\image\\frame\\all1\\'
         # get the full path of each video, which will open the video tp extract frames
         each_video_full_path = os.path.join(videos_src_path, each_video)
 
@@ -117,7 +117,7 @@ def get_media_each_frame(each_video_name,each_video):
     :param each_video: 带后缀的视频文件
     :return:
     '''
-    each_video_save_full_path = 'E:\LOG\image\\frame\\all2\\'
+    each_video_save_full_path = 'E:\LOG\image\\frame\\all4\\'
     #each_video_save_full_path = os.path.join(videos_save_path, each_video_name) + '/'
 
     # get the full path of each video, which will open the video tp extract frames
@@ -182,8 +182,8 @@ def main(list1):
 if __name__ == '__main__':
     #get_all_frame_image()
     get_first_last_frame_each_video()
-    # get_all_frame_image=sample_group()
-    #
+    #get_all_frame_image=sample_group()
+
     # each_ten_get_two = []
     # for i in get_all_frame_image:
     #     length_ten_arry=len(i)
